@@ -148,6 +148,9 @@
 #ifndef MICROPY_PY_UJSON
 #define MICROPY_PY_UJSON            (1)
 #endif
+#ifndef MICROPY_PY_UMSGPACK
+#define MICROPY_PY_UMSGPACK         (1)
+#endif
 #ifndef MICROPY_PY_URE
 #define MICROPY_PY_URE              (1)
 #endif
