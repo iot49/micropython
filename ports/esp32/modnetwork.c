@@ -729,6 +729,41 @@ unknown:
 }
 MP_DEFINE_CONST_FUN_OBJ_KW(esp_config_obj, 1, esp_config);
 
+#if MICROPY_HW_ENABLE_MDNS_RESPONDER
+
+STATIC mp_obj_t mdns_add_service(size_t n_args, const mp_obj_t *args) {
+    if (!mdns_initialised) {
+        mp_raise_msg(&mp_type_OSError, MP_ERROR_TEXT("mDNS server not started."));
+    }
+    const char *service = mp_obj_str_get_str(args[1]);
+    if (service[0] != '_') {
+		mp_raise_ValueError(MP_ERROR_TEXT("Service name must start with '_'"));
+    }
+    const char *protocol = mp_obj_str_get_str(args[2]);
+    if ((strcmp(protocol, "_tcp") != 0) && (strcmp(protocol, "_udp") != 0)) {
+		mp_raise_ValueError(MP_ERROR_TEXT("Protocol must be '_tcp' or '_udp'"));
+    }
+    int port = mp_obj_get_int(args[3]);
+    if ((port < 1) || (port > 0xFFFF)) {
+		mp_raise_ValueError(MP_ERROR_TEXT("Invalid port number"));
+    }
+    const char *instance_name = NULL;
+    if (n_args > 4) {
+        instance_name = mp_obj_str_get_str(args[4]);
+    }
+    return (mdns_service_add(instance_name, service, protocol, port, NULL, 0) == ESP_OK) ? mp_const_true : mp_const_false;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mdns_add_service_obj, 4, 5, mdns_add_service);
+
+STATIC mp_obj_t mdns_remove_service(mp_obj_t self_in, mp_obj_t service_, mp_obj_t protocol_) {
+    const char *service = mp_obj_str_get_str(service_);
+    const char *protocol = mp_obj_str_get_str(protocol_);
+    return (mdns_service_remove(service, protocol) == ESP_OK) ? mp_const_true : mp_const_false;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_3(mdns_remove_service_obj, mdns_remove_service);
+
+#endif
+
 STATIC const mp_rom_map_elem_t wlan_if_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_active), MP_ROM_PTR(&esp_active_obj) },
     { MP_ROM_QSTR(MP_QSTR_connect), MP_ROM_PTR(&esp_connect_obj) },
@@ -738,6 +773,10 @@ STATIC const mp_rom_map_elem_t wlan_if_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_isconnected), MP_ROM_PTR(&esp_isconnected_obj) },
     { MP_ROM_QSTR(MP_QSTR_config), MP_ROM_PTR(&esp_config_obj) },
     { MP_ROM_QSTR(MP_QSTR_ifconfig), MP_ROM_PTR(&esp_ifconfig_obj) },
+#if MICROPY_HW_ENABLE_MDNS_RESPONDER
+    { MP_ROM_QSTR(MP_QSTR_mdns_add_service), MP_ROM_PTR(&mdns_add_service_obj) },
+    { MP_ROM_QSTR(MP_QSTR_mdns_remove_service), MP_ROM_PTR(&mdns_remove_service_obj) },
+#endif
 };
 
 STATIC MP_DEFINE_CONST_DICT(wlan_if_locals_dict, wlan_if_locals_dict_table);
