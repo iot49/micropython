@@ -1,6 +1,19 @@
 #define MICROPY_HW_BOARD_NAME       "Motor Breakout Hat"
 #define MICROPY_HW_MCU_NAME         "STM32F405RG"
 
+// MICROPY_OBJ_REPR_C: floats not on heap (ok in interrupt handlers)
+// see py/mpconfig.h and py/obj.h
+// Assume that if we already defined the obj repr then we also defined these items
+#define MICROPY_OBJ_REPR (MICROPY_OBJ_REPR_C)
+
+// these are normally defined in ../../mpconfigport.h
+// but only if MICROPY_OBJ_REPR is NOT defined here
+#define UINT_FMT "%u"
+#define INT_FMT "%d"
+typedef int mp_int_t; // must be pointer size
+typedef unsigned int mp_uint_t; // must be pointer size
+
+// Board features
 #define MICROPY_HW_HAS_SWITCH       (0)
 #define MICROPY_HW_HAS_FLASH        (1)
 #define MICROPY_HW_HAS_MMA7660      (0)
