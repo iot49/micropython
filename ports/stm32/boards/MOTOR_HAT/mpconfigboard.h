@@ -53,7 +53,7 @@ typedef unsigned int mp_uint_t; // must be pointer size
 #define MICROPY_HW_UART6_RX     (pin_C7)  // D5
 
 // UART REPL
-#define MICROPY_HW_UART_REPL        PYB_UART_3
+#define MICROPY_HW_UART_REPL        PYB_UART_6
 #define MICROPY_HW_UART_REPL_BAUD   115200
 
 // I2C busses
